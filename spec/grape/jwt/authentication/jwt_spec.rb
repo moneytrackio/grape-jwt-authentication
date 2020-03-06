@@ -161,7 +161,7 @@ RSpec.describe Grape::Jwt::Authentication::Jwt do
       Grape::Jwt::Authentication.configure do |conf|
         conf.jwt_issuer = issuer
         conf.jwt_beholder = audience.first
-        conf.jwt_verification_key = -> { public_key }
+        conf.jwt_verification_key = -> (header, payload) { public_key }
       end
     end
 

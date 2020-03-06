@@ -38,9 +38,11 @@ module Grape
         #
         # @return [Jwt]
         def initialize(token)
-          parsed_payload = JWT.decode(token, nil, false).first.symbolize_keys
+          parsed_jwt = JWT.decode(token, nil, false)
+
           @token = token
-          @payload = RecursiveOpenStruct.new(parsed_payload)
+          @header =  RecursiveOpenStruct.new( parsed_jwt[1].symbolize_keys)
+          @payload = RecursiveOpenStruct.new(parsed_jwt.first.symbolize_keys)
         end
 
         # Checks if the payload says this is a refresh token.
@@ -76,7 +78,7 @@ module Grape
         def verification_key
           unless @verification_key
             conf = Grape::Jwt::Authentication.configuration
-            return conf.jwt_verification_key.call
+            return conf.jwt_verification_key.call(@header, @payload)
           end
           @verification_key
         end
